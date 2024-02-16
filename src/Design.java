@@ -57,6 +57,7 @@ public class Design {
         return indices[0] * d*d + indices[1] + d + indices[2];
     }
 
+    @Deprecated
     public void symmetry_constraint(){
         int v1, v2;
         ArrayList<Integer> vlist1, vlist2;
@@ -82,6 +83,27 @@ public class Design {
         }
     }
 
+    public void solo_clause(int x1){
+        ArrayList<Integer> clause = new ArrayList<>();
+        clause.add(x1);
+        create_constraint(clause);
+    }
+
+    public void duo_clause(int x1, int x2){
+        ArrayList<Integer> clause = new ArrayList<>();
+        clause.add(x1);
+        clause.add(x2);
+        create_constraint(clause);
+    }
+
+    public void trio_clause(int x1,int x2,int x3){
+        ArrayList<Integer> clause = new ArrayList<>();
+        clause.add(x1);
+        clause.add(x2); 
+        clause.add(x3);
+        create_constraint(clause);
+    }
+
     public void atmost_k(List<Integer> x_variables, int k, int constraint_number){
         int s_increment = d*d*e + d*tables*e;
         int n = x_variables.size();
@@ -95,55 +117,28 @@ public class Design {
         }
 
 
-        ArrayList<Integer> clause = new ArrayList<>();
-
-        clause.add(-x_variables.get(0));
-        clause.add(s_increment);
-        create_constraint(clause);
+        duo_clause(-x_variables.get(0), s_increment);
 
         for(int j=1; j<k; j++){
-            clause = new ArrayList<>();
-            clause.add(-s_increment - j);
-
-            create_constraint(clause);
+            solo_clause(-s_increment - j);
         }
 
         ////// Loop clauses \\\\\\\\
         for (int i=1; i<n-1; i++){
-            clause = new ArrayList<>();
-            clause.add(-x_variables.get(i));
-            clause.add(s_increment + i*k);
-            create_constraint(clause);
+            duo_clause(-x_variables.get(i), s_increment + i*k);
 
-            clause = new ArrayList<>();
-            clause.add(-(s_increment + (i-1)*k));
-            clause.add(s_increment + i*k);
-            create_constraint(clause);
+            duo_clause(-(s_increment + (i-1)*k), s_increment + i*k);
 
             for (int j=1; j<k; j++){
-                clause = new ArrayList<>();
-                clause.add(-x_variables.get(i));
-                clause.add(-(s_increment + (i-1)*k + j-1));
-                clause.add(s_increment + i*k + j);
-                create_constraint(clause);
+                trio_clause(-x_variables.get(i), -(s_increment + (i-1)*k + j-1), s_increment + i*k + j);
 
-                clause = new ArrayList<>();
-                clause.add(-(s_increment + (i-1)*k + j));
-                clause.add(s_increment + i*k + j);
-                create_constraint(clause);
+                duo_clause(-(s_increment + (i-1)*k + j), s_increment + i*k + j);
             }
 
-            clause = new ArrayList<>();
-            clause.add(-x_variables.get(i));
-            clause.add(-(s_increment + (i-1)*k ));
-            create_constraint(clause);
+            duo_clause(-x_variables.get(i), -(s_increment + (i-1)*k ));
         }
 
-        clause = new ArrayList<>();
-        clause.add(-x_variables.get(n-1));
-        clause.add(s_increment + k*(n-1) );
-        create_constraint(clause);
-
+        duo_clause(-x_variables.get(n-1), s_increment + k*(n-1));
     }
 
     public void andimply(List<Integer> impliers, int implied){
