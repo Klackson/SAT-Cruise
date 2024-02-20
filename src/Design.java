@@ -47,7 +47,7 @@ public class Design {
                 + nbclause_col_constraint * nb_col_constraints
                 + nbclause_correspondence_constraint * nb_correspondence_constraints;
 
-        this.constraints.append("p cnf ").append(nb_vars).append(" ").append(nb_clauses);
+        //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(nb_clauses);
     }
 
     public void create_clause(List<Integer> variables){
@@ -268,6 +268,7 @@ public class Design {
         xy_correspondence();
 
         //System.out.println(constraints);
+        this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
 
         try {
             String filename = "cruise"+d+"_"+c+"_"+e+".txt";
