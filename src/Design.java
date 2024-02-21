@@ -62,8 +62,9 @@ public class Design {
     }
 
     public int vectorize_index(int[] indices, char vartype){
-        if (vartype=='x') return indices[0] * d*d + indices[1] * d + indices[2];
-        if (vartype=='y') return d*d*e + indices[0] * d*tables + indices[1] * tables + indices[2];
+        if (vartype=='x') return indices[0] * d*d + indices[1] * d + indices[2] +1;
+
+        if (vartype=='y') return d*d*e + indices[0] * d*tables + indices[1] * tables + indices[2] +1;
         else{
             System.out.println("Use a correct vartype");
             return 0;
@@ -120,17 +121,19 @@ public class Design {
     public void atmost_k(List<Integer> x_variables, int k, int constraint_number){
         int clausecount=0;
 
-        int s_increment = d*d*e + d*tables*e;
+        int s_increment = d*d*e + d*tables*e + 1 +constraint_number;
         int n = x_variables.size();
 
-        if (k==c){
+        if (k==c || k==d-c){
             s_increment += nb_pair_constraints * nbvar_per_pair_constraint;
+
             if(constraint_number%2==0) s_increment += constraint_number * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2;
             else s_increment += (constraint_number-1) * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2 + nbvar_per_col_constraint1;
         }
-        if(k==1){
+        else if(k==1){
             s_increment += constraint_number * nbvar_per_pair_constraint;
         }
+        //System.out.println(k+" "+s_increment);
 
         duo_clause(-x_variables.get(0), s_increment);
         clausecount++;
@@ -157,11 +160,11 @@ public class Design {
                 clausecount++;
             }
 
-            duo_clause(-x_variables.get(i), -(s_increment + (i-1)*k ));
+            duo_clause(-x_variables.get(i), -(s_increment + i*k-1 ));
             clausecount++;
         }
 
-        duo_clause(-x_variables.get(n-1), s_increment + k*(n-1));
+        duo_clause(-x_variables.get(n-1), -s_increment - k*(n-1) );
         clausecount++;
         //System.out.println(clausecount==2*n*k+n-3*k-1);
         //constraints.append("\n");
@@ -259,13 +262,14 @@ public class Design {
     }
 
     public void solve(){
-        no_double_dinner();
+        //no_double_dinner();
+        //constraints.append("\nheyhey");
         c_per_table();
         xy_correspondence();
 
         //System.out.println(constraints);
         //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
-        String final_constraints = "p cnf "+nb_vars+" "+actual_nb_clauses+constraints.toString();
+        String final_constraints = /* "p cnf "+nb_vars+" "+actual_nb_clauses+ */constraints.toString();
 
         try {
             String filename = "cruise"+d+"_"+c+"_"+e+".txt";

@@ -2,6 +2,7 @@ public class Main {
 
     public static void main(String[] args){
         Design cruise = new Design(8,2,7);
+        System.out.println("tables is "+cruise.tables);
 
         cruise.solve();
         System.out.println(cruise.nb_clauses+", actually "+cruise.actual_nb_clauses+" clauses");
