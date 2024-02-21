@@ -18,8 +18,8 @@ public class Design {
 
     //Helper constants :
     final int nb_col_constraints, nb_pair_constraints, nb_correspondence_constraints;
-    final int nbvar_per_col_constraint, nbvar_per_pair_constraint;
-    final int nbclause_col_constraint, nbclause_pair_constraint, nbclause_correspondence_constraint;
+    final int nbvar_per_col_constraint1, nbvar_per_col_constraint2, nbvar_per_pair_constraint;
+    final int nbclause_col_constraint1, nbclause_col_constraint2, nbclause_pair_constraint, nbclause_correspondence_constraint;
 
     public Design(int d, int c, int e){
         this.e = e;
@@ -27,24 +27,26 @@ public class Design {
         this.d = d;
         this.tables = d/c;
 
-        nb_col_constraints = tables*e*2;
+        nb_col_constraints = tables*e;
         nb_pair_constraints = d*(d-1);
         nb_correspondence_constraints = d*(d-1)*tables*e;
 
-        nbvar_per_col_constraint = (d-1)*c;
+        nbvar_per_col_constraint1 = (d-1)*c;
+        nbvar_per_col_constraint2 = (d-1)*(d-c);
         nbvar_per_pair_constraint = e-1;
 
         this.nb_vars = d*d*e; // x variables
         this.nb_vars+= d*tables*e; // y variables
-        this.nb_vars+= nb_col_constraints * nbvar_per_col_constraint; // s variables for column constraints
+        this.nb_vars+= nb_col_constraints * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2); // s variables for column constraints
         this.nb_vars+= nb_pair_constraints * nbvar_per_pair_constraint; // s variables for pair constraints
 
         nbclause_pair_constraint = 2*e + e - 3 -1;
-        nbclause_col_constraint = 2*d*c + d - 3*c -1;
+        nbclause_col_constraint1 = 2*d*c + d - 3*c -1;
+        nbclause_col_constraint2 = 2*d*(d-c) + d - 3*(d-c) -1;
         nbclause_correspondence_constraint = 2;
 
         this.nb_clauses = nbclause_pair_constraint * nb_pair_constraints
-                + nbclause_col_constraint * nb_col_constraints
+                + (nbclause_col_constraint1 + nbclause_col_constraint2) * nb_col_constraints
                 + nbclause_correspondence_constraint * nb_correspondence_constraints;
 
         //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(nb_clauses);
@@ -55,7 +57,7 @@ public class Design {
         for(int variable : variables){
             constraint.append(variable).append(" ");
         }
-        this.constraints.append("\n").append(constraint).append(" 0");
+        this.constraints.append("\n").append(constraint).append("0");
         actual_nb_clauses++;
     }
 
@@ -122,13 +124,13 @@ public class Design {
         int n = x_variables.size();
 
         if (k==c){
-            s_increment += nb_pair_constraints * nbvar_per_pair_constraint
-                    + constraint_number * nbvar_per_col_constraint;
+            s_increment += nb_pair_constraints * nbvar_per_pair_constraint;
+            if(constraint_number%2==0) s_increment += constraint_number * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2;
+            else s_increment += (constraint_number-1) * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2 + nbvar_per_col_constraint1;
         }
         if(k==1){
             s_increment += constraint_number * nbvar_per_pair_constraint;
         }
-
 
         duo_clause(-x_variables.get(0), s_increment);
         clausecount++;
@@ -136,18 +138,14 @@ public class Design {
         for(int j=1; j<k; j++){
             solo_clause(-s_increment - j);
             clausecount++;
-
         }
-
 
         for (int i=1; i<n-1; i++){
             duo_clause(-x_variables.get(i), s_increment + i*k);
             clausecount++;
 
-
             duo_clause(-(s_increment + (i-1)*k), s_increment + i*k);
             clausecount++;
-
 
             for (int j=1; j<k; j++){
                 trio_clause(-x_variables.get(i),
@@ -155,10 +153,8 @@ public class Design {
                         s_increment + i*k + j);
                 clausecount++;
 
-
                 duo_clause(-(s_increment + (i-1)*k + j), s_increment + i*k + j);
                 clausecount++;
-
             }
 
             duo_clause(-x_variables.get(i), -(s_increment + (i-1)*k ));
@@ -167,8 +163,8 @@ public class Design {
 
         duo_clause(-x_variables.get(n-1), s_increment + k*(n-1));
         clausecount++;
-
         //System.out.println(clausecount==2*n*k+n-3*k-1);
+        //constraints.append("\n");
     }
 
     public void andimply(List<Integer> impliers, int implied){
@@ -206,8 +202,8 @@ public class Design {
 
                         v1x = vectorize_index(new int[]{t,i,j}, 'x');
                         v2x = vectorize_index(new int[]{t,j,i}, 'x');
-                        andimply(new ArrayList<Integer>(List.of(v1y,v2y)), v1x);
-                        andimply(new ArrayList<Integer>(List.of(v1y,v2y)), v2x);
+                        andimply(new ArrayList<>(List.of(v1y,v2y)), v1x);
+                        andimply(new ArrayList<>(List.of(v1y,v2y)), v2x);
                         count+=2;
                     }
                 }
@@ -240,7 +236,7 @@ public class Design {
                 constraint_number++;
             }
         }
-        actual_nbclauses_sum = constraint_number * nbclause_col_constraint;
+        actual_nbclauses_sum = constraint_number/2 * (nbclause_col_constraint1 + nbclause_col_constraint2);
     }
 
     public void no_double_dinner(){
@@ -268,7 +264,8 @@ public class Design {
         xy_correspondence();
 
         //System.out.println(constraints);
-        this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
+        //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
+        String final_constraints = "p cnf "+nb_vars+" "+actual_nb_clauses+constraints.toString();
 
         try {
             String filename = "cruise"+d+"_"+c+"_"+e+".txt";
@@ -276,7 +273,7 @@ public class Design {
             if (myObj.createNewFile()) {
                 System.out.println("File created: " + myObj.getName());
                 FileWriter myWriter = new FileWriter(filename);
-                myWriter.write(constraints.toString());
+                myWriter.write(final_constraints);
                 myWriter.close();
             } else {
                 System.out.println("File already exists.");
