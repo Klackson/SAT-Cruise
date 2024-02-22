@@ -11,8 +11,8 @@ public class OutputConversion {
     int d,c,e,tables;
 
     public static void main(String[] args){
-        if (args.length != 4) {
-            throw new IllegalArgumentException("Please provide exactly four arguments");
+        if (args.length != 3) {
+            throw new IllegalArgumentException("Please provide exactly three arguments");
         }
         int d = Integer.parseInt(args[0]);
         int c = Integer.parseInt(args[1]);
@@ -48,8 +48,13 @@ public class OutputConversion {
     }
 
     public OutputConversion(String vars, int d, int c, int e){
-        String[] listvars = vars.split(",");
+        String[] listvars = vars.split("\\s+");
         int tables = d/c;
+
+        System.out.println("listvars range: 0 to " + (listvars.length - 1));
+        System.out.println("start index:  " + (d*d*e+1));
+        System.out.println("end index: " + (d*d*e+1 + d*tables*e));
+
         listvars = Arrays.copyOfRange(listvars, d*d*e+1, d*d*e+1 + d*tables*e);
 
         int[] intvars = new int[listvars.length];
