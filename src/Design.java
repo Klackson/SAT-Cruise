@@ -299,7 +299,7 @@ public class Design {
 
         //System.out.println(constraints);
         //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
-        String final_constraints = /* "p cnf "+nb_vars+" "+actual_nb_clauses+ */constraints.toString();
+        String final_constraints = /* "p cnf "+nb_vars+" "+actual_nb_clauses+ */"c"+constraints.toString();
 
         try {
             String filename = "cruise"+d+"_"+c+"_"+e+".txt";
