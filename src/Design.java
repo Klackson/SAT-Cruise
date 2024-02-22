@@ -21,6 +21,10 @@ public class Design {
     final int nbvar_per_col_constraint1, nbvar_per_col_constraint2, nbvar_per_pair_constraint;
     final int nbclause_col_constraint1, nbclause_col_constraint2, nbclause_pair_constraint, nbclause_correspondence_constraint;
 
+    public String getConstraints() {
+        return this.constraints.toString();
+    }
+
     public Design(int d, int c, int e){
         this.e = e;
         this.c = c;
@@ -301,11 +305,11 @@ public class Design {
         //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
         String final_constraints = /* "p cnf "+nb_vars+" "+actual_nb_clauses+ */"c"+constraints.toString();
 
-        try {
+        /*try {
             String filename = "cruise"+d+"_"+c+"_"+e+".txt";
             File myObj = new File(filename);
             if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
+                //System.out.println("File created: " + myObj.getName());
                 FileWriter myWriter = new FileWriter(filename);
                 myWriter.write(final_constraints);
                 myWriter.close();
@@ -318,7 +322,7 @@ public class Design {
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-        }
+        }*/
     }
 
 }
