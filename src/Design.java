@@ -121,11 +121,11 @@ public class Design {
     public void atmost_k(List<Integer> x_variables, int k, int constraint_number){
         int clausecount=0;
 
-        int s_increment = d*d*e + d*tables*e + 1 +constraint_number;
+        int s_increment = d*d*e + d*tables*e + 1 + constraint_number;
         int n = x_variables.size();
 
         if (k==c || k==d-c){
-            s_increment += nb_pair_constraints * nbvar_per_pair_constraint;
+            //s_increment += nb_pair_constraints * nbvar_per_pair_constraint;
 
             if(constraint_number%2==0) s_increment += constraint_number * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2;
             else s_increment += (constraint_number-1) * (nbvar_per_col_constraint1 + nbvar_per_col_constraint2)/2 + nbvar_per_col_constraint1;
@@ -198,8 +198,8 @@ public class Design {
         for(int t=0; t<e; t++){
             for(int l=0; l<tables; l++){
                 for(int i=0; i<d; i++){
-                    for(int j=0; j<d; j++){
-                        if(i==j)continue;
+                    for(int j=i+1; j<d; j++){
+                        //if(i==j)continue;
                         v1y =vectorize_index(new int[]{t,i,l}, 'y');
                         v2y =vectorize_index(new int[]{t,j,l}, 'y');
 
@@ -242,7 +242,30 @@ public class Design {
         actual_nbclauses_sum = constraint_number/2 * (nbclause_col_constraint1 + nbclause_col_constraint2);
     }
 
+    public void single_table(){
+        // A diner eats at at least one table per evening
+        ArrayList<Integer> row_i;
+        for(int t=0; t<e; t++){
+            for(int i =0; i<d; i++){
+                row_i = new ArrayList<>();
+
+                for(int j=0; j<tables; j++){
+                    row_i.add(vectorize_index(new int[]{t,i,j}, 'y'));
+                }
+                create_clause(row_i);
+                /*
+                for(int l=0; l<tables; l++) {
+                    for (int l2 = l + 1; l2 < tables; l2++) {
+                        duo_clause( -row_i.get(l), -row_i.get(l2) );
+                    }
+                }*/
+
+            }
+        }
+    }
+
     public void no_double_dinner(){
+        // any pair of diners never eat together more than once
         ArrayList<Integer> pairs_ij;
         int constraint_number=0;
 
@@ -254,18 +277,25 @@ public class Design {
                 for(int t=0; t<e; t++){
                     pairs_ij.add(vectorize_index(new int[]{t,i,j}, 'x'));
                 }
-                atmost_k(pairs_ij, 1, constraint_number);
+                for(int t=0; t<e; t++) {
+                    for (int t2 = t + 1; t2 < e; t2++) {
+                        duo_clause( -pairs_ij.get(t), -pairs_ij.get(t2) );
+                    }
+                }
+                //atmost_k(pairs_ij, 1, constraint_number);
                 constraint_number++;
             }
         }
         actual_nb_clauses_pair = constraint_number * nbclause_pair_constraint;
     }
 
-    public void solve(){
-        //no_double_dinner();
+    public void model(){
+        no_double_dinner();
         //constraints.append("\nheyhey");
         c_per_table();
+        //constraints.append("\nhoho");
         xy_correspondence();
+        single_table();
 
         //System.out.println(constraints);
         //this.constraints.append("p cnf ").append(nb_vars).append(" ").append(actual_nb_clauses);
@@ -284,7 +314,7 @@ public class Design {
             }
             Stream<String> fileStream = Files.lines(Paths.get(filename));
             //Lines count
-            System.out.println( fileStream.count()+" lines in the file");
+            //System.out.println( fileStream.count()+" lines in the file");
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
