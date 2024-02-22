@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 public class OutputConversion {
@@ -9,12 +12,25 @@ public class OutputConversion {
 
     public static void main(String[] args){
         if (args.length != 4) {
-            throw new IllegalArgumentException("Please provide exactly three arguments");
+            throw new IllegalArgumentException("Please provide exactly four arguments");
         }
         int d = Integer.parseInt(args[0]);
         int c = Integer.parseInt(args[1]);
         int e = Integer.parseInt(args[2]);
-        OutputConversion conversion = new OutputConversion(args[3], d,c,e);
+
+        StringBuilder arg3= new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                arg3.append(line);
+            }
+        }
+        catch (IOException error) {
+            System.out.println("An error occurred in reading stdin.");
+            error.printStackTrace();
+        }
+
+        OutputConversion conversion = new OutputConversion(arg3.toString(), d,c,e);
         System.out.println(conversion.getSolution());
     }
 
