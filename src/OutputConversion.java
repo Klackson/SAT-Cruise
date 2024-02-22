@@ -51,9 +51,9 @@ public class OutputConversion {
         String[] listvars = vars.split("\\s+");
         int tables = d/c;
 
-        System.out.println("listvars range: 0 to " + (listvars.length - 1));
-        System.out.println("start index:  " + (d*d*e+1));
-        System.out.println("end index: " + (d*d*e+1 + d*tables*e));
+        //System.out.println("listvars range: 0 to " + (listvars.length - 1));
+        //System.out.println("start index:  " + (d*d*e+1));
+        //System.out.println("end index: " + (d*d*e+1 + d*tables*e));
 
         listvars = Arrays.copyOfRange(listvars, d*d*e+1, d*d*e+1 + d*tables*e);
 
@@ -67,6 +67,7 @@ public class OutputConversion {
     }
 
     public void fillIntMatrix(){
+        intmatrix = new int[e][d][tables];
         int counter=0;
         for (int var : outputvars){
             intmatrix[counter/(d*tables)][(counter%(d*tables))/tables][counter%tables] = var;
