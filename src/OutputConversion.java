@@ -31,18 +31,18 @@ public class OutputConversion {
         }
 
         OutputConversion conversion = new OutputConversion(arg3.toString(), d,c,e);
-        System.out.println(conversion.getSolution());
     }
 
     public OutputConversion(String vars, int d, int c, int e){
         String[] listvars = vars.split("\\s+");
-        int tables = d/c;
+        this.tables = d/c;
 
         //System.out.println("listvars range: 0 to " + (listvars.length - 1));
         //System.out.println("start index:  " + (d*d*e+1));
         //System.out.println("end index: " + (d*d*e+1 + d*tables*e));
 
-        listvars = Arrays.copyOfRange(listvars, d*d*e+1, d*d*e+1 + d*tables*e);
+        //listvars = Arrays.copyOfRange(listvars, d*d*e+1, d*d*e+1 + d*tables*e);
+        listvars = Arrays.copyOfRange(listvars, d*d*e, d*d*e + d*tables*e);
 
         int[] intvars = new int[listvars.length];
 
@@ -59,13 +59,27 @@ public class OutputConversion {
 
         fillIntMatrix();
         fillStringMatrix();
+        
+        //DEBUG
+        //for(int t=0; t<e; t++){
+        //    for(int i=0; i<d; i++){
+        //        for(int j=0; j<tables; j++){
+        //            System.out.print(intmatrix[t][i][j]+" ");
+        //        }
+        //        System.out.println("");
+        //    }
+        //    System.out.println("");
+        //}
     }
 
     public void fillIntMatrix(){
+        //System.out.println("d is " + d + " tables is " + tables);
         intmatrix = new int[e][d][tables];
         int counter=0;
         for (int var : outputvars){
-            intmatrix[counter/(d*tables)][(counter%(d*tables))/tables][counter%tables] = var;
+            //intmatrix[counter/(d*tables)][(counter%(d*tables))/tables][counter%tables] = var;
+            //intmatrix[(counter+1)/(d*tables)][(counter%(d*tables))/tables][counter%tables] = var;
+            intmatrix[counter/(d*tables)][(counter%(d*tables))/tables][counter%tables] = (int) (Math.signum(var) +1)/2;
             counter++;
         }
     }
