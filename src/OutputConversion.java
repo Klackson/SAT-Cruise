@@ -34,19 +34,6 @@ public class OutputConversion {
         System.out.println(conversion.getSolution());
     }
 
-    public OutputConversion(int[] vars, int d, int c, int e){
-        this.d=d;
-        this.c=c;
-        this.e=e;
-        final_matrix.append(d).append(" ").append(c).append(" ").append(e).append("\n");
-        tables = d/c;
-        if(vars.length != d*tables*e) outputvars = Arrays.copyOfRange(vars, d*d*e+1, d*d*e+1 + d*tables*e);
-        else outputvars = vars;
-
-        fillIntMatrix();
-        fillStringMatrix();
-    }
-
     public OutputConversion(String vars, int d, int c, int e){
         String[] listvars = vars.split("\\s+");
         int tables = d/c;
@@ -62,8 +49,16 @@ public class OutputConversion {
         for(int i=0; i<listvars.length; i++){
             intvars[i] = Integer.valueOf(listvars[i]);
         }
+        this.d=d;
+        this.c=c;
+        this.e=e;
+        final_matrix.append(d).append(" ").append(c).append(" ").append(e).append("\n");
+        tables = d/c;
+        if(intvars.length != d*tables*e) outputvars = Arrays.copyOfRange(intvars, d*d*e+1, d*d*e+1 + d*tables*e);
+        else outputvars = intvars;
 
-        new OutputConversion(intvars, d,c, e);
+        fillIntMatrix();
+        fillStringMatrix();
     }
 
     public void fillIntMatrix(){
